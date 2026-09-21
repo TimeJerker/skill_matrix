@@ -12,7 +12,7 @@ db_url = URL.create(
     username="postgres",
     password=os.getenv("DATABASE_PASSWORD"),
     host="localhost",
-    port=5432,
+    port=os.getenv("PORT"),
     database="skill_matrix",
 )
 
