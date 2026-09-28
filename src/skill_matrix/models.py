@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import String, ForeignKey, ForeignKeyConstraint, Text, BigInteger
+from sqlalchemy import String, ForeignKey,Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
@@ -17,8 +17,8 @@ class User(Base):
     __tablename__ = "user"
 
     user_id: Mapped[int] = mapped_column(primary_key=True)
-    role_role_id: Mapped[int] = mapped_column(ForeignKey("role.role_id"), primary_key=True)
 
+    role_id: Mapped[int] = mapped_column(ForeignKey("role.role_id"), nullable=False)
     username: Mapped[str] = mapped_column(String(20))
     email: Mapped[str] = mapped_column(String(20), unique=True)
     password: Mapped[str] = mapped_column(String(20))
@@ -27,6 +27,7 @@ class User(Base):
     role: Mapped["Role"] = relationship(back_populates="users")
     user_skills: Mapped[List["UserSkill"]] = relationship(back_populates="user")
     project_memberships: Mapped[List["ProjectMember"]] = relationship(back_populates="user")
+    managed_projects: Mapped[List["Project"]] = relationship(back_populates="manager",foreign_keys="Project.manager_id")
 
 class Skill(Base):
     __tablename__ = "skill"
@@ -43,16 +44,8 @@ class UserSkill(Base):
 
     level: Mapped[int] = mapped_column()
 
-    skill_skill_id: Mapped[int] = mapped_column(ForeignKey("skill.skill_id"), primary_key=True)
-    user_user_id: Mapped[int] = mapped_column(primary_key=True)
-    role_id: Mapped[int] = mapped_column(primary_key=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_user_id", "role_id"],         
-            ["user.user_id", "user.role_role_id"]
-        ),
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"), primary_key=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skill.skill_id"), primary_key=True)
 
     user: Mapped["User"] = relationship(back_populates="user_skills")
     skill: Mapped["Skill"] = relationship(back_populates="user_skills")
@@ -64,33 +57,17 @@ class Project(Base):
     title: Mapped[str] = mapped_column(String(20))
     description: Mapped[str] = mapped_column(Text)
 
-    user_user_id: Mapped[int] = mapped_column()
-    manager_id: Mapped[int] = mapped_column()
-    role_id: Mapped[int] = mapped_column()
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_user_id", "role_id"],
-            ["user.user_id", "user.role_role_id"],
-            name="Project_user_fk"
-        ),  
-    )
+    manager_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"), nullable=False)
 
     members: Mapped[List["ProjectMember"]] = relationship(back_populates="project")
+    manager: Mapped["User"] = relationship(back_populates="managed_projects", foreign_keys=[manager_id])
+
 
 class ProjectMember(Base):
     __tablename__ = "project_member"
 
-    user_user_id: Mapped[int] = mapped_column(primary_key=True)
-    project_project_id: Mapped[int] = mapped_column(ForeignKey("project.project_id"), primary_key=True)
-    role_id: Mapped[int] = mapped_column(primary_key=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["user_user_id", "role_id"],
-            ["user.user_id", "user.role_role_id"],
-        ),
-    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"), primary_key=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("project.project_id"), primary_key=True)
 
     user: Mapped["User"] = relationship(back_populates="project_memberships")
     project: Mapped["Project"] = relationship(back_populates="members")

@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, insert
 from config import settings
-from base import Base, Role
+from models import Base, Role
 
 engine = create_engine(settings.DATABASE_URL())
 

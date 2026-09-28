@@ -1,10 +1,11 @@
 [project]
 name = "skill-matrix"
 version = "0.1.0"
-description = "Add your description here"
+description = "Распределённая система управления компетенциями"
 readme = "README.md"
 authors = [
-    { name = "TimeJerker", email = "krov1chh@gmail.com" }
+    { name = "TimeJerker", email = "krov1chh@gmail.com" },
+    { name = "KsysaY", email = "jashina.xen@gmail.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
