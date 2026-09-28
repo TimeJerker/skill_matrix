@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.skill_matrix.models import (Role, User, Skill, Project)
+from src.skill_matrix.models import (Role, User, Skill, Project, UserSkill, ProjectMember)
 
 
 # ROLE
@@ -84,6 +84,21 @@ def delete_user(session: Session, user_id: int) -> bool:
         return True
     return False
 
+def find_users_by_skill(session: Session, skill_name: str, min_level: int = 1) -> list[User]:
+    """Найти пользователей с указанным навыком и уровнем не ниже min_level"""
+    stmt = (
+        select(User)
+        .join(UserSkill, User.user_id == UserSkill.user_id)
+        .join(Skill, UserSkill.skill_id == Skill.skill_id)
+        .where(Skill.name == skill_name)
+        .where(UserSkill.level >= min_level)
+    )
+    return list(session.scalars(stmt))
+
+def read_user_skills(session: Session, user_id: int) -> list[UserSkill]:
+    return list(session.scalars(select(UserSkill).where(UserSkill.user_id == user_id)))
+
+
 
 # SKILL
 
@@ -119,6 +134,20 @@ def delete_skill(session: Session, skill_id: int) -> bool:
     skill = session.get(Skill, skill_id)
     if skill:
         session.delete(skill)
+        session.commit()
+        return True
+    return False
+
+def add_skill_to_user(session: Session, user_id: int, skill_id: int, level: int) -> UserSkill:
+    us = UserSkill(user_id=user_id, skill_id=skill_id, level=level)
+    session.add(us)
+    session.commit()
+    return 
+
+def remove_skill_from_user(session: Session, user_id: int, skill_id: int) -> bool:
+    us = session.get(UserSkill, (user_id, skill_id))
+    if us:
+        session.delete(us)
         session.commit()
         return True
     return False
@@ -161,3 +190,10 @@ def delete_project(session: Session, project_id: int) -> bool:
         session.commit()
         return True
     return False
+
+def assign_user_to_project(session: Session, user_id: int, project_id: int) -> ProjectMember:
+    pm = ProjectMember(user_id=user_id, project_id=project_id)
+    session.add(pm)
+    session.commit()
+    return pm
+

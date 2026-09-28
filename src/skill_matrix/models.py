@@ -22,7 +22,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(20))
     email: Mapped[str] = mapped_column(String(20), unique=True)
     password: Mapped[str] = mapped_column(String(20))
-    department: Mapped[str] = mapped_column(Text)
+    department: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
     role: Mapped["Role"] = relationship(back_populates="users")
     user_skills: Mapped[List["UserSkill"]] = relationship(back_populates="user")

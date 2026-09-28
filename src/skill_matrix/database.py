@@ -1,16 +1,12 @@
 from sqlalchemy import create_engine, insert
-from config import settings
-from models import Base, Role
+from sqlalchemy.orm import sessionmaker
+from src.skill_matrix.config import settings
+from src.skill_matrix.models import Base, Role
 
-engine = create_engine(settings.DATABASE_URL())
+engine = create_engine(settings.DATABASE_URL(), echo=False)
+
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 def create_tables():
-    with engine.connect() as conn:
-        Base.metadata.create_all(conn)
-        conn.commit()
-
-def insert_data():
-    with engine.connect() as conn:
-        stmt = insert(Role).values(name="Admin")
-        conn.execute(stmt)
-        conn.commit()
+    Base.metadata.create_all(engine)
+    print("Таблицы созданы")
