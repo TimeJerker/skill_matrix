@@ -3,6 +3,11 @@ from sqlalchemy.orm import Session
 
 from src.skill_matrix.models import (Role, User, Skill, Project, UserSkill, ProjectMember)
 
+#Удвление всех таблиц
+
+def drop_all_tables():
+    Base.metadata.drop_all(engine)
+    print("Все таблицы удалены")
 
 # ROLE
 
@@ -197,3 +202,9 @@ def assign_user_to_project(session: Session, user_id: int, project_id: int) -> P
     session.commit()
     return pm
 
+def read_project_members(session: Session, project_id: int) -> list[User]:
+    """Cисок участников проекта"""
+    project = session.get(Project, project_id)
+    if not project:
+        return []
+    return [pm.user for pm in project.members]
