@@ -39,11 +39,17 @@ def main():
         )
         print("5. Проекты:", [(p.title, p.manager.username) for p in crud.read_all_projects(session)])
 
+        project1 = crud.create_project(
+                    session, "ABC", "test", manager.user_id
+                )
+        print("5. Проекты:", [(p.title, p.manager.username) for p in crud.read_all_projects(session)])
+
         # Назначить  на проект
         crud.assign_user_to_project(session, employee.user_id, project.project_id)
+        crud.assign_user_to_project(session, 1, 2)
         print("6. Участники проекта:", [u.username for u in crud.read_project_members(session, project.project_id)])
 
-        # Поиск кандидатов по навыку
+        # Поиск кандидатов по навыку 
         candidates = crud.find_users_by_skill(session, "Python", min_level=2)
         print("7. Кандидаты с Python >= Middle:", [u.username for u in candidates])
 
@@ -55,6 +61,10 @@ def main():
         # Удаление навыка
         crud.remove_skill_from_user(session, employee.user_id, sql_skill.skill_id)
         print("9. Навыки Ивана после удаления SQL:", [us.skill.name for us in crud.read_user_skills(session, employee.user_id)])
+
+        ## Поиск кандидатов по навыку и чтобы он не был в другом проекте
+        find_user = crud.find_candidates_for_project(session, skill_id = 1, project_id = 1)
+        print([u.username for u in find_user])
 
 
 if __name__ == "__main__":

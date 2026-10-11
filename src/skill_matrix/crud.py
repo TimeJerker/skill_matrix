@@ -3,12 +3,6 @@ from sqlalchemy.orm import Session
 
 from src.skill_matrix.models import (Role, User, Skill, Project, UserSkill, ProjectMember)
 
-#Удвление всех таблиц
-
-def drop_all_tables():
-    Base.metadata.drop_all(engine)
-    print("Все таблицы удалены")
-
 # ROLE
 
 def create_role(session: Session, name: str) -> Role:
@@ -23,6 +17,9 @@ def read_role(session: Session, role_id: int) -> Role | None:
 
 def read_role_by_name(session: Session, name: str) -> Role | None:
     return session.scalar(select(Role).where(Role.name == name))
+
+def read_user_by_username(session: Session, username: str) -> User | None:
+    return session.scalar(select(User).where(User.username == username))
 
 def read_all_roles(session: Session) -> list[Role]:
     return list(session.scalars(select(Role)))
@@ -203,8 +200,22 @@ def assign_user_to_project(session: Session, user_id: int, project_id: int) -> P
     return pm
 
 def read_project_members(session: Session, project_id: int) -> list[User]:
-    """Cисок участников проекта"""
+    """Cписок участников проекта"""
     project = session.get(Project, project_id)
     if not project:
         return []
     return [pm.user for pm in project.members]
+
+def find_candidates_for_project(session: Session, skill_id: int, project_id: int) -> list[User] | None:
+
+    in_project = select(ProjectMember.user_id).where(
+        ProjectMember.project_id == project_id
+    )
+
+    stmt = (
+        select(User)
+        .join(UserSkill, UserSkill.user_id == User.user_id)
+        .where(UserSkill.skill_id == skill_id)
+        .where(User.user_id.not_in(in_project)) 
+    )
+    return list(session.scalars(stmt))

@@ -1,0 +1,4 @@
+#Запуск из корня
+uv run uvicorn src.skill_matrix.rest_api.api:app --reload 
+
+#После успешного подключения открыть в браузере http://localhost:8000/docs
