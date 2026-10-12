@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
 
 class RoleResponse(BaseModel):
     role_id: int
@@ -25,5 +26,39 @@ class UserResponse(BaseModel):
     role_id: int
     department: str | None
 
+    class Config:
+        from_attributes = True
+
+class SkillBase(BaseModel):
+    name: str
+    category: Optional[str] = None
+
+class SkillCreate(SkillBase):
+    pass
+
+class SkillUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+
+class SkillResponse(SkillBase):
+    id: int
+    class Config:
+        from_attributes = True 
+
+
+class ProjectBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    manager_id: int
+
+class ProjectCreate(ProjectBase):
+    pass
+
+class ProjectUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+class ProjectResponse(ProjectBase):
+    id: int
     class Config:
         from_attributes = True
