@@ -55,7 +55,7 @@ class Project(Base):
 
     project_id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(20))
-    description: Mapped[str] = mapped_column(Text)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     manager_id: Mapped[int] = mapped_column(ForeignKey("user.user_id"), nullable=False)
 

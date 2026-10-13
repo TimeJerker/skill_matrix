@@ -206,7 +206,7 @@ def read_project_members(session: Session, project_id: int) -> list[User]:
         return []
     return [pm.user for pm in project.members]
 
-def find_candidates_for_project(session: Session, skill_id: int, project_id: int) -> list[User] | None:
+def find_candidates_for_project(session: Session, skill_id: int, project_id: int, min_level = 1) -> list[User] | None:
 
     in_project = select(ProjectMember.user_id).where(
         ProjectMember.project_id == project_id
@@ -216,6 +216,7 @@ def find_candidates_for_project(session: Session, skill_id: int, project_id: int
         select(User)
         .join(UserSkill, UserSkill.user_id == User.user_id)
         .where(UserSkill.skill_id == skill_id)
+        .where(UserSkill.level >= min_level)
         .where(User.user_id.not_in(in_project)) 
     )
     return list(session.scalars(stmt))

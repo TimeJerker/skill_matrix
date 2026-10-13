@@ -41,7 +41,7 @@ class SkillUpdate(BaseModel):
     category: Optional[str] = None
 
 class SkillResponse(SkillBase):
-    id: int
+    skill_id: int
     class Config:
         from_attributes = True 
 
@@ -59,6 +59,10 @@ class ProjectUpdate(BaseModel):
     description: Optional[str] = None
 
 class ProjectResponse(ProjectBase):
-    id: int
+    project_id: int
+    title: str
+    description: str | None
+    manager_id: int
     class Config:
         from_attributes = True
+
