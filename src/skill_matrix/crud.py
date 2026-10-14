@@ -65,17 +65,24 @@ def read_user_by_email(session: Session, email: str) -> User | None:
 def read_all_users(session: Session) -> list[User]:
     return list(session.scalars(select(User)))
 
-def update_user(session: Session, user_id: int, username: str | None = None, email: str | None = None, department: str | None = None) -> User | None:
+def update_user(session: Session, user_id: int, username: str | None = None, email: str | None = None, password: str | None = None,role_id: int | None = None,department: str | None = None) -> User | None:
     user = session.get(User, user_id)
-    if user:
-        if username is not None:
-            user.username = username
-        if email is not None:
-            user.email = email
-        if department is not None:
-            user.department = department
-        session.commit()
-        session.refresh(user)
+    if not user:
+        return None
+
+    if username is not None:
+        user.username = username
+    if email is not None:
+        user.email = email
+    if password is not None:
+        user.password = password
+    if role_id is not None:
+        user.role_id = role_id
+    if department is not None:
+        user.department = department
+
+    session.commit()
+    session.refresh(user)
     return user
 
 def delete_user(session: Session, user_id: int) -> bool:

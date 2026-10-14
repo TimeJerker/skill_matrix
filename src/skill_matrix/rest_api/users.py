@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.skill_matrix.database import get_db
 from src.skill_matrix import crud
-from src.skill_matrix.rest_api.schemas import UserResponse, UserRegister
+from src.skill_matrix.rest_api.schemas import UserResponse, UserRegister, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -26,9 +26,21 @@ def create_user(data: UserRegister, db: Session = Depends(get_db)):
     return crud.create_user(db, data.username, data.email, data.password, data.role_id, data.department)
 
 
-@router.put("/{user_id}", response_model=UserResponse)
-def update_user(user_id: int, department: str, db: Session = Depends(get_db)):
-    user = crud.update_user(db, user_id, department=department)
+@router.patch("/{user_id}", response_model=UserResponse)
+def update_user(
+    user_id: int,
+    data: UserUpdate,
+    db: Session = Depends(get_db),
+):
+    user = crud.update_user(
+        db,
+        user_id,
+        username=data.username,
+        email=data.email,
+        password=data.password,
+        role_id=data.role_id,
+        department=data.department,
+    )
     if not user:
         raise HTTPException(404, "Пользователь не найден")
     return user

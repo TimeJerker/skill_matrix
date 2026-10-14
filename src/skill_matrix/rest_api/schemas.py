@@ -29,6 +29,13 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class UserUpdate(BaseModel):
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
+    role_id: int | None = None
+    department: str | None = None
+
 class SkillBase(BaseModel):
     name: str
     category: Optional[str] = None
