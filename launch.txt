@@ -1,4 +1,11 @@
-#Запуск из корня
-uv run uvicorn src.skill_matrix.rest_api.api:app --reload 
+# Для создания matching_pb2_grpc.py и matching_pb2.py (уже есть, это для справки)
+uv run python -m grpc_tools.protoc -I src/skill_matrix/grpc --python_out=src/skill_matrix/grpc --grpc_python_out=src/skill_matrix/grpc src/skill_matrix/grpc/matching.proto
 
-#После успешного подключения открыть в браузере http://localhost:8000/docs
+# Запустить gRPC-сервис Терминал 1 
+uv run python -m src.skill_matrix.grpc.grpc_service
+
+# Запустить FastAPI Терминал 2
+uv run uvicorn src.skill_matrix.rest_api.api:app --port 8000
+
+# Провека через Swagger
+http://localhost:8000/docs

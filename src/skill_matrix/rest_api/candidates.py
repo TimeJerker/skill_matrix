@@ -5,6 +5,8 @@ from src.skill_matrix.database import get_db
 from src.skill_matrix import crud
 from src.skill_matrix.rest_api.schemas import UserResponse
 
+from src.skill_matrix.grpc.grpc_client import find_candidates as grpc_find_candidates
+
 
 router = APIRouter(prefix="/candidates", tags=["candidates"])
 
@@ -23,10 +25,11 @@ def find_candidates(
     if not crud.read_project(db, project_id):
         raise HTTPException(404, "Проект не найден")
 
-    candidates = crud.find_candidates_for_project(
+    #candidates = crud.find_candidates_for_project(
         db,
         skill_id=skill_id,
         project_id=project_id,
         min_level=min_level,
-    )
-    return candidates
+    #)
+    candidates = grpc_find_candidates(skill_id, project_id, min_level)
+    return candidates 
