@@ -7,6 +7,8 @@ from src.skill_matrix.rest_api import schemas
 from src.skill_matrix import crud
 from src.skill_matrix.database import get_db
 
+from skill_matrix.communication.rabbitmq_producer import publish_assignment_event
+
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 @router.post("/", response_model=schemas.ProjectResponse)
@@ -47,3 +49,30 @@ def delete_project_endpoint(project_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Project not found")
     return {"message": "Project successfully deleted"}
+
+@router.post("/{project_id}/assign/{user_id}")
+async def assign_user_to_project_endpoint(project_id: int, user_id: int, session: Session = Depends(get_db)):
+
+    try:
+        member = crud.assign_user_to_project(
+            session=session, 
+            user_id=user_id, 
+            project_id=project_id
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Failed to add employee: {e}"
+        )
+
+    await publish_assignment_event(
+        user_id=user_id,
+        project_id=project_id,
+        task_name="Participation in the project"
+    )
+
+    return {
+        "status": "success",
+        "message": f"Employee {user_id} successfully added to project '{project_id}'",
+        "project_member_id": getattr(member, "id", None)
+    }
