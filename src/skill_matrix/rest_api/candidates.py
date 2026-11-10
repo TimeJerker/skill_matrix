@@ -5,7 +5,7 @@ from src.skill_matrix.database import get_db
 from src.skill_matrix import crud
 from src.skill_matrix.rest_api.schemas import UserResponse
 
-from src.skill_matrix.grpc.grpc_client import find_candidates as grpc_find_candidates
+from src.skill_matrix.grpc.grpc_client import find_candidates_stream as grpc_find_candidates
 
 
 router = APIRouter(prefix="/candidates", tags=["candidates"])
@@ -32,4 +32,5 @@ def find_candidates(
         min_level=min_level,
     #)
     candidates = grpc_find_candidates(skill_id, project_id, min_level)
+    #print(type(candidates))
     return candidates 

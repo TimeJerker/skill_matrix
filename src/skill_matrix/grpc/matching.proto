@@ -24,3 +24,7 @@ message FindCandidatesResponse {
 service MatchingService {
     rpc FindCandidates(FindCandidatesRequest) returns (FindCandidatesResponse);
 }
+
+service MatchingServiceStream {
+    rpc FindCandidatesStream(FindCandidatesRequest) returns (stream Candidate);
+}

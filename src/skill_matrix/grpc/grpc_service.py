@@ -36,11 +36,40 @@ class MatchingService(matching_pb2_grpc.MatchingServiceServicer):
         finally:
             db.close()
 
+class MatchingServiceStream(matching_pb2_grpc.MatchingServiceStreamServicer):
+    def FindCandidatesStream(self, request, context):
+
+        print(f"Запрос: skill_id={request.skill_id}, "f"project_id={request.project_id}, min_level={request.min_level}")
+        db = SessionLocal()
+        try:
+            candidates = crud.find_candidates_for_project(
+                db,
+                skill_id=request.skill_id,
+                project_id=request.project_id,
+                min_level=request.min_level,
+            )
+
+            print(f"Найдено кандидатов: {len(candidates)}")
+            for user in candidates:
+                print(f"{user.username} (id={user.user_id})")
+                candidate = matching_pb2.Candidate(
+                    user_id=user.user_id,
+                    username=user.username,
+                    email=user.email,
+                    level=0,
+                    role_id=user.role_id,  
+                    department=user.department or "",
+                )
+                yield candidate
+        finally:
+            db.close()
+
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     matching_pb2_grpc.add_MatchingServiceServicer_to_server(
         MatchingService(), server
     )
+    matching_pb2_grpc.add_MatchingServiceStreamServicer_to_server(MatchingServiceStream(), server)
     server.add_insecure_port("[::]:50051")
     server.start()
     print("gRPC сервер запущен на порту 50051")

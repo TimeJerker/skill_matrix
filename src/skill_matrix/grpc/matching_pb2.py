@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ematching.proto\x12\x08matching\"P\n\x15\x46indCandidatesRequest\x12\x10\n\x08skill_id\x18\x01 \x01(\x05\x12\x12\n\nproject_id\x18\x02 \x01(\x05\x12\x11\n\tmin_level\x18\x03 \x01(\x05\"q\n\tCandidate\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\r\n\x05level\x18\x04 \x01(\x05\x12\x0f\n\x07role_id\x18\x05 \x01(\x05\x12\x12\n\ndepartment\x18\x06 \x01(\t\"A\n\x16\x46indCandidatesResponse\x12\'\n\ncandidates\x18\x01 \x03(\x0b\x32\x13.matching.Candidate2f\n\x0fMatchingService\x12S\n\x0e\x46indCandidates\x12\x1f.matching.FindCandidatesRequest\x1a .matching.FindCandidatesResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ematching.proto\x12\x08matching\"P\n\x15\x46indCandidatesRequest\x12\x10\n\x08skill_id\x18\x01 \x01(\x05\x12\x12\n\nproject_id\x18\x02 \x01(\x05\x12\x11\n\tmin_level\x18\x03 \x01(\x05\"q\n\tCandidate\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\r\n\x05level\x18\x04 \x01(\x05\x12\x0f\n\x07role_id\x18\x05 \x01(\x05\x12\x12\n\ndepartment\x18\x06 \x01(\t\"A\n\x16\x46indCandidatesResponse\x12\'\n\ncandidates\x18\x01 \x03(\x0b\x32\x13.matching.Candidate2f\n\x0fMatchingService\x12S\n\x0e\x46indCandidates\x12\x1f.matching.FindCandidatesRequest\x1a .matching.FindCandidatesResponse2g\n\x15MatchingServiceStream\x12N\n\x14\x46indCandidatesStream\x12\x1f.matching.FindCandidatesRequest\x1a\x13.matching.Candidate0\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,4 +39,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_FINDCANDIDATESRESPONSE']._serialized_end=290
   _globals['_MATCHINGSERVICE']._serialized_start=292
   _globals['_MATCHINGSERVICE']._serialized_end=394
+  _globals['_MATCHINGSERVICESTREAM']._serialized_start=396
+  _globals['_MATCHINGSERVICESTREAM']._serialized_end=499
 # @@protoc_insertion_point(module_scope)

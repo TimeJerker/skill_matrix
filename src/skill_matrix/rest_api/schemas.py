@@ -22,7 +22,7 @@ class UserLogin(BaseModel):
 class UserResponse(BaseModel):
     user_id: int
     username: str
-    email: EmailStr
+    email: EmailStr | None
     role_id: int
     department: str | None
 
