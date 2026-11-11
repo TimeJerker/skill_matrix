@@ -7,7 +7,8 @@ from src.skill_matrix.rest_api import schemas
 from src.skill_matrix import crud
 from src.skill_matrix.database import get_db
 
-from skill_matrix.communication.rabbitmq_producer import publish_assignment_event
+#from skill_matrix.communication.rabbitmq_producer import publish_assignment_event
+from src.skill_matrix.communication.rabbitmq_producer import publish_assignment_event
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
