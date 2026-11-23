@@ -1,11 +1,14 @@
-# Для создания matching_pb2_grpc.py и matching_pb2.py (уже есть, это для справки)
-uv run python -m grpc_tools.protoc -I src/skill_matrix/grpc --python_out=src/skill_matrix/grpc --grpc_python_out=src/skill_matrix/grpc src/skill_matrix/grpc/matching.proto
+1) docker compose up --build        # первая сборка + запуск
+   docker compose up                 # дальнейшие запуски
+   docker compose up -d              # в фоне
 
-# Запустить gRPC-сервис Терминал 1 
-uv run python -m src.skill_matrix.grpc.grpc_service
+2) Проверка сервисов:
+   - Swagger API:        http://localhost:8000/docs
+   - WebSocket клиент:   python -m src.skill_matrix.communication.client <user_id>
+   - RabbitMQ management: http://localhost:15672  (guest / guest)
 
-# Запустить FastAPI Терминал 2
-uv run uvicorn src.skill_matrix.rest_api.api:app --port 8000
-
-# Провека через Swagger
-http://localhost:8000/docs
+3) Логи и остановка:
+   docker compose logs -f api
+   docker compose logs -f notification
+   docker compose down              # остановка (данные БД сохранятся)
+   docker compose down -v         # остановка и удаление данных БД

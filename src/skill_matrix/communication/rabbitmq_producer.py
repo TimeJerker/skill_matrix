@@ -1,12 +1,13 @@
 import json
 import aio_pika
 
-RABBITMQ_URL = "amqp://guest:guest@localhost:5672/"
+from src.skill_matrix.config import settings
+
 QUEUE_NAME = "task_notifications"
 
 async def publish_assignment_event(user_id: int, project_id: int, task_name: str):
 
-    connection = await aio_pika.connect_robust(RABBITMQ_URL)
+    connection = await aio_pika.connect_robust(settings.RABBITMQ_URL())
     async with connection:
         channel = await connection.channel()
         

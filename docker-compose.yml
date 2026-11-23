@@ -1,0 +1,89 @@
+services:
+  db:
+    image: postgres:16
+    container_name: skill_matrix_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 135Aaa
+      POSTGRES_DB: skill_matrix
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: skill_matrix_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  grpc:
+    build: .
+    container_name: skill_matrix_grpc
+    command: uv run --no-sync python -u -m src.skill_matrix.grpc.grpc_service
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DATABASE_PASS: 135Aaa
+      DB_NAME: skill_matrix
+      RABBITMQ_HOST: rabbitmq
+      GRPC_HOST: 0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: .
+    container_name: skill_matrix_api
+    command: uv run uvicorn src.skill_matrix.rest_api.api:app --host 0.0.0.0 --port 8000
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DATABASE_PASS: 135Aaa
+      DB_NAME: skill_matrix
+      RABBITMQ_HOST: rabbitmq
+      GRPC_HOST: grpc
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      grpc:
+        condition: service_started
+
+  notification:
+    build: .
+    container_name: skill_matrix_notification
+    command: uv run python -m src.skill_matrix.communication.notification_service
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DATABASE_PASS: 135Aaa
+      DB_NAME: skill_matrix
+      RABBITMQ_HOST: rabbitmq
+      WS_HOST: 0.0.0.0
+      WS_PORT: 8001
+    ports:
+      - "8001:8001"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

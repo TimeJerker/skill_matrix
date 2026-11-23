@@ -4,10 +4,12 @@ from typing import Dict, List
 import aio_pika
 import websockets
 
-RABBITMQ_URL = "amqp://guest:guest@localhost:5672/"
+from src.skill_matrix.config import settings
+
+RABBITMQ_URL = settings.RABBITMQ_URL()
 QUEUE_NAME = "task_notifications"
-WS_HOST = "127.0.0.1"
-WS_PORT = 8001
+WS_HOST = settings.WS_HOST
+WS_PORT = settings.WS_PORT
 
 class ConnectionManager:
     def __init__(self):
