@@ -3,15 +3,15 @@ services:
     image: postgres:16
     container_name: skill_matrix_db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 135Aaa
-      POSTGRES_DB: skill_matrix
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASS}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -34,12 +34,10 @@ services:
     command: uv run --no-sync python -u -m src.skill_matrix.grpc.grpc_service
     environment:
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DATABASE_PASS: 135Aaa
-      DB_NAME: skill_matrix
-      RABBITMQ_HOST: rabbitmq
-      GRPC_HOST: 0.0.0.0
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DB_NAME: ${DB_NAME}
     depends_on:
       db:
         condition: service_healthy
@@ -50,10 +48,10 @@ services:
     command: uv run uvicorn src.skill_matrix.rest_api.api:app --host 0.0.0.0 --port 8000
     environment:
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DATABASE_PASS: 135Aaa
-      DB_NAME: skill_matrix
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DB_NAME: ${DB_NAME}
       RABBITMQ_HOST: rabbitmq
       GRPC_HOST: grpc
     ports:
@@ -69,16 +67,15 @@ services:
   notification:
     build: .
     container_name: skill_matrix_notification
+    restart: unless-stopped
     command: uv run python -m src.skill_matrix.communication.notification_service
     environment:
       DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DATABASE_PASS: 135Aaa
-      DB_NAME: skill_matrix
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DB_NAME: ${DB_NAME}
       RABBITMQ_HOST: rabbitmq
-      WS_HOST: 0.0.0.0
-      WS_PORT: 8001
     ports:
       - "8001:8001"
     depends_on:

@@ -6,11 +6,11 @@ ENV_FILE = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    DB_HOST: str = "localhost"
-    DB_PORT: int = 5432
-    DB_USER: str = "postgres"
-    DATABASE_PASS: str = "135Aaa"
-    DB_NAME: str = "skill_matrix"
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DATABASE_PASS: str
+    DB_NAME: str
 
     RABBITMQ_HOST: str = "localhost"
     RABBITMQ_PORT: int = 5672
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     GRPC_HOST: str = "localhost"
     GRPC_PORT: int = 50051
 
-    WS_HOST: str = "0.0.0.0"  # внутри контейнера слушаем на всех интерфейсах
+    WS_HOST: str = "0.0.0.0"
     WS_PORT: int = 8001
 
     model_config = SettingsConfigDict(env_file=ENV_FILE, env_file_encoding="utf-8")
