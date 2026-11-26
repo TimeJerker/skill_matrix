@@ -1,0 +1,19 @@
+FROM python:3.12-slim AS base
+
+WORKDIR /app
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+FROM base AS builder
+COPY pyproject.toml uv.lock README.md ./
+RUN uv sync --frozen --no-install-project --no-dev
+
+FROM builder AS common
+COPY --from=builder /app/.venv /app/.venv
+COPY pyproject.toml uv.lock README.md ./
+
+
+FROM common AS grpc
+COPY src/skill_matrix/grpc ./src/skill_matrix/grpc
+RUN uv sync --frozen --no-dev
+CMD ["uv", "run", "python", "-u", "-m", "src.skill_matrix.grpc.grpc_service"]

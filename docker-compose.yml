@@ -16,6 +16,18 @@ services:
       timeout: 5s
       retries: 10
 
+  nginx:
+    image: nginx:alpine
+    container_name: skill_matrix_nginx
+    restart: always
+    ports: 
+      - "80:80"
+    volumes: 
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api 
+      - api2
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: skill_matrix_rabbitmq
@@ -29,7 +41,10 @@ services:
       retries: 10
 
   grpc:
-    build: .
+    build:
+      context: .
+      target: grpc
+      dockerfile: Dockerfile_grpc
     container_name: skill_matrix_grpc
     command: uv run --no-sync python -u -m src.skill_matrix.grpc.grpc_service
     environment:
@@ -43,7 +58,10 @@ services:
         condition: service_healthy
 
   api:
-    build: .
+    build:
+      context: .
+      target: api
+      dockerfile: Dockerfile_api
     container_name: skill_matrix_api
     command: uv run uvicorn src.skill_matrix.rest_api.api:app --host 0.0.0.0 --port 8000
     environment:
@@ -54,6 +72,7 @@ services:
       DB_NAME: ${DB_NAME}
       RABBITMQ_HOST: rabbitmq
       GRPC_HOST: grpc
+      INSTANCE_ID: "API_1"
     ports:
       - "8000:8000"
     depends_on:
@@ -64,8 +83,37 @@ services:
       grpc:
         condition: service_started
 
+  api2:
+    build:
+      context: .
+      target: api
+      dockerfile: Dockerfile_api
+    container_name: skill_matrix_api2
+    command: uv run uvicorn src.skill_matrix.rest_api.api:app --host 0.0.0.0 --port 8000
+    environment:
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DATABASE_PASS: ${DATABASE_PASS}
+      DB_NAME: ${DB_NAME}
+      RABBITMQ_HOST: rabbitmq
+      GRPC_HOST: grpc
+      INSTANCE_ID: "API_2"
+    ports:
+      - "8088:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      grpc:
+        condition: service_started
+
   notification:
-    build: .
+    build:
+      context: .
+      target: notification
+      dockerfile: Dockerfile_noth
     container_name: skill_matrix_notification
     restart: unless-stopped
     command: uv run python -m src.skill_matrix.communication.notification_service
